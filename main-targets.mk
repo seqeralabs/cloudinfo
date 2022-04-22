@@ -36,7 +36,7 @@ config.toml:
 	sed 's/production/development/g; s/debug = false/debug = true/g; s/shutdownTimeout = "5s"/shutdownTimeout = "0s"/g; s/format = "json"/format = "logfmt"/g; s/level = "info"/level = "trace"/g; s/address = ":/address = "127.0.0.1:/g' config.toml.dist > config.toml
 
 .PHONY: build
-build: ## Build a binary
+build: web-go ## Build a binary
 ifeq (${VERBOSE}, 1)
 	go env
 endif
@@ -47,19 +47,12 @@ endif
 	go build ${GOARGS} -tags "${GOTAGS}" -ldflags "${LDFLAGS}" -o ${BUILD_DIR}/${BINARY_NAME} ${BUILD_PACKAGE}
 
 .PHONY: build-release
-build-release: $(patsubst cmd/%,cmd/%/pkged.go,$(wildcard cmd/*)) ## Build all binaries without debug information
+build-release: ## Build all binaries without debug information
 	@${MAKE} LDFLAGS="-w ${LDFLAGS}" GOARGS="${GOARGS} -trimpath" BUILD_DIR="${BUILD_DIR}/release" build
 
 .PHONY: build-debug
-build-debug: $(patsubst cmd/%,cmd/%/pkged.go,$(wildcard cmd/*)) ## Build all binaries with remote debugging capabilities
+build-debug: ## Build all binaries with remote debugging capabilities
 	@${MAKE} GOARGS="${GOARGS} -gcflags \"all=-N -l\"" BUILD_DIR="${BUILD_DIR}/debug" build
-
-bin/pkger: go.mod
-	@mkdir -p bin
-	go build -o bin/pkger github.com/markbates/pkger/cmd/pkger
-
-cmd/%/pkged.go: bin/pkger ## Embed static files
-	bin/pkger -o cmd/$*
 
 .PHONY: docker
 docker: ## Build a Docker image
@@ -87,6 +80,7 @@ bin/gotestsum-${GOTESTSUM_VERSION}:
 TEST_PKGS ?= ./...
 TEST_REPORT_NAME ?= results.xml
 .PHONY: test
+test: web-go
 test: TEST_REPORT ?= main
 test: TEST_FORMAT ?= short
 test: SHELL = /bin/bash
@@ -114,8 +108,9 @@ bin/golangci-lint-${GOLANGCI_VERSION}:
 	@mv bin/golangci-lint $@
 
 .PHONY: lint
+lint: web-go
 lint: bin/golangci-lint ## Run linter
-	bin/golangci-lint run
+	bin/golangci-lint run --timeout 3m
 
 .PHONY: fix
 fix: bin/golangci-lint ## Fix lint violations
@@ -129,11 +124,13 @@ bin/licensei-${LICENSEI_VERSION}:
 	@mv bin/licensei $@
 
 .PHONY: license-check
+license-check: web-go
 license-check: bin/licensei ## Run license check
 	bin/licensei check
 	./scripts/check-header.sh
 
 .PHONY: license-cache
+license-cache: web-go
 license-cache: bin/licensei ## Generate license cache
 	bin/licensei cache
 
@@ -150,20 +147,23 @@ help:
 var-%: ; @echo $($*)
 varexport-%: ; @echo $*=$($*)
 
-bin/gobin: bin/gobin-${GOBIN_VERSION}
-	@ln -sf gobin-${GOBIN_VERSION} bin/gobin
-bin/gobin-${GOBIN_VERSION}:
-	@mkdir -p bin
-	curl -L https://github.com/myitcv/gobin/releases/download/v${GOBIN_VERSION}/${OS}-amd64 > ./bin/gobin-${GOBIN_VERSION} && chmod +x ./bin/gobin-${GOBIN_VERSION}
-
 bin/gqlgen: bin/gqlgen-${GQLGEN_VERSION}
 	@ln -sf gqlgen-${GQLGEN_VERSION} bin/gqlgen
-bin/gqlgen-${GQLGEN_VERSION}: bin/gobin
+bin/gqlgen-${GQLGEN_VERSION}:
 	@mkdir -p bin
-	GOBIN=bin/ bin/gobin github.com/99designs/gqlgen@v${GQLGEN_VERSION}
+	GOBIN=$$PWD/bin go install github.com/99designs/gqlgen@v${GQLGEN_VERSION}
 	@mv bin/gqlgen bin/gqlgen-${GQLGEN_VERSION}
 
 .PHONY: graphql
 graphql: bin/gqlgen ## Generate GraphQL code
 	bin/gqlgen
 
+web-go: web/dist/web/index.html web/dist/web/assets/index.html
+
+web/dist/web/index.html:
+	@mkdir -p web/dist/web
+	@touch web/dist/web/index.html
+
+web/dist/web/assets/index.html:
+	@mkdir -p web/dist/web/assets
+	@touch web/dist/web/assets/index.html
