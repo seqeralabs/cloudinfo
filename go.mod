@@ -8,7 +8,7 @@ require (
 	emperror.dev/emperror v0.33.0
 	emperror.dev/errors v0.8.0
 	emperror.dev/handler/logur v0.5.0
-	github.com/99designs/gqlgen v0.13.0
+	github.com/99designs/gqlgen v0.17.3
 	github.com/Azure/azure-sdk-for-go v55.5.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.11.19
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.7
@@ -39,7 +39,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/testify v1.7.0
-	github.com/vektah/gqlparser/v2 v2.2.0
+	github.com/vektah/gqlparser/v2 v2.4.2
 	go.opencensus.io v0.23.0
 	golang.org/x/oauth2 v0.0.0-20210615190721-d04028783cf1
 	google.golang.org/api v0.49.0
