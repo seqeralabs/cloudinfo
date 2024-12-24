@@ -36,7 +36,7 @@ config.toml:
 	sed 's/production/development/g; s/debug = false/debug = true/g; s/shutdownTimeout = "5s"/shutdownTimeout = "0s"/g; s/format = "json"/format = "logfmt"/g; s/level = "info"/level = "trace"/g; s/address = ":/address = "127.0.0.1:/g' config.toml.dist > config.toml
 
 .PHONY: build
-build: web-go ## Build a binary
+build: ## Build a binary
 ifeq (${VERBOSE}, 1)
 	go env
 endif
@@ -80,7 +80,7 @@ bin/gotestsum-${GOTESTSUM_VERSION}:
 TEST_PKGS ?= ./...
 TEST_REPORT_NAME ?= results.xml
 .PHONY: test
-test: web-go
+test:
 test: TEST_REPORT ?= main
 test: TEST_FORMAT ?= short
 test: SHELL = /bin/bash
@@ -123,13 +123,3 @@ bin/gqlgen-${GQLGEN_VERSION}:
 .PHONY: graphql
 graphql: bin/gqlgen ## Generate GraphQL code
 	bin/gqlgen
-
-web-go: web/dist/web/index.html web/dist/web/assets/index.html
-
-web/dist/web/index.html:
-	@mkdir -p web/dist/web
-	@touch web/dist/web/index.html
-
-web/dist/web/assets/index.html:
-	@mkdir -p web/dist/web/assets
-	@touch web/dist/web/assets/index.html

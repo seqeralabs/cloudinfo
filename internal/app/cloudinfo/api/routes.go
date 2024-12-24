@@ -15,17 +15,10 @@
 package api
 
 import (
-	"fmt"
-	"io/fs"
-	"io/ioutil"
 	"net/http"
-	"strings"
 
-	"emperror.dev/emperror"
-	"emperror.dev/errors"
 	ginprometheus "github.com/banzaicloud/go-gin-prometheus"
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 
 	"github.com/banzaicloud/cloudinfo/internal/cloudinfo"
@@ -33,7 +26,6 @@ import (
 	"github.com/banzaicloud/cloudinfo/internal/cloudinfo/types"
 	"github.com/banzaicloud/cloudinfo/internal/platform/buildinfo"
 	"github.com/banzaicloud/cloudinfo/internal/platform/log"
-	"github.com/banzaicloud/cloudinfo/web"
 )
 
 // RouteHandler configures the REST API routes in the gin router
@@ -68,32 +60,7 @@ func (r *RouteHandler) ConfigureRoutes(router *gin.Engine, basePath string) {
 	router.Use(log.Middleware())
 	router.Use(cors.New(corsConfig))
 
-	webFiles, _ := fs.Sub(web.Files(), "dist/web")
-	router.Use(static.Serve(basePath, fileSystem(webFiles)))
-
 	base := router.Group(basePath)
-
-	{
-		indexFile, err := webFiles.Open("index.html")
-		emperror.Panic(errors.WrapIf(err, "open index.html"))
-
-		indexContent, err := ioutil.ReadAll(indexFile)
-		emperror.Panic(err)
-
-		newIndexContent := []byte(strings.Replace(
-			string(indexContent),
-			"<base href=\"/\">",
-			fmt.Sprintf("<base href=\"%s/\">", basePath),
-			-1,
-		))
-
-		base.GET("/", func(c *gin.Context) {
-			_, _ = c.Writer.Write(newIndexContent)
-		})
-		base.GET("index.html", func(c *gin.Context) {
-			c.Redirect(http.StatusMovedPermanently, "./")
-		})
-	}
 
 	{
 		base.GET("/status", r.signalStatus)

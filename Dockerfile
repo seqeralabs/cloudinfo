@@ -1,17 +1,3 @@
-# UI build image
-FROM node:16.5.0 as frontend
-
-WORKDIR /web
-
-COPY web/package.json web/package-lock.json /web/
-
-RUN npm install --legacy-peer-deps
-
-COPY web/ /web/
-
-RUN npm run build-prod
-
-
 # Build image
 FROM golang:1.16-alpine3.13 AS builder
 
