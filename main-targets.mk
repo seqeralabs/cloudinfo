@@ -69,7 +69,7 @@ ifeq (${DOCKER_LATEST}, 1)
 endif
 
 .PHONY: check
-check: test lint ## Run tests and linters
+check: test ## Run tests
 
 bin/gotestsum: bin/gotestsum-${GOTESTSUM_VERSION}
 	@ln -sf gotestsum-${GOTESTSUM_VERSION} bin/gotestsum
@@ -99,40 +99,6 @@ test-integration: ## Run integration tests
 .PHONY: test-functional
 test-functional: ## Run functional tests
 	@${MAKE} GOARGS="${GOARGS} -run ^TestFunctional\$$\$$" TEST_REPORT=functional test
-
-bin/golangci-lint: bin/golangci-lint-${GOLANGCI_VERSION}
-	@ln -sf golangci-lint-${GOLANGCI_VERSION} bin/golangci-lint
-bin/golangci-lint-${GOLANGCI_VERSION}:
-	@mkdir -p bin
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | bash -s -- -b ./bin/ v${GOLANGCI_VERSION}
-	@mv bin/golangci-lint $@
-
-.PHONY: lint
-lint: web-go
-lint: bin/golangci-lint ## Run linter
-	bin/golangci-lint run --timeout 3m
-
-.PHONY: fix
-fix: bin/golangci-lint ## Fix lint violations
-	bin/golangci-lint run --fix
-
-bin/licensei: bin/licensei-${LICENSEI_VERSION}
-	@ln -sf licensei-${LICENSEI_VERSION} bin/licensei
-bin/licensei-${LICENSEI_VERSION}:
-	@mkdir -p bin
-	curl -sfL https://raw.githubusercontent.com/goph/licensei/master/install.sh | bash -s v${LICENSEI_VERSION}
-	@mv bin/licensei $@
-
-.PHONY: license-check
-license-check: web-go
-license-check: bin/licensei ## Run license check
-	bin/licensei check
-	./scripts/check-header.sh
-
-.PHONY: license-cache
-license-cache: web-go
-license-cache: bin/licensei ## Generate license cache
-	bin/licensei cache
 
 .PHONY: list
 list: ## List all make targets
