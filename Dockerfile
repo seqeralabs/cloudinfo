@@ -15,7 +15,6 @@ RUN go mod download
 
 COPY Makefile main-targets.mk /workspace/
 
-COPY --from=frontend /web/dist/web /workspace/web/dist/web
 COPY . /workspace
 
 ARG BUILD_TARGET
