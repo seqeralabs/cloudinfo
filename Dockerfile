@@ -1,23 +1,9 @@
-# UI build image
-FROM node:14.15.0 as frontend
-
-WORKDIR /web
-
-COPY web/package.json web/package-lock.json /web/
-
-RUN npm install
-
-COPY web/ /web/
-
-RUN npm run build-prod
-
-
 # Build image
-FROM golang:1.14-alpine3.11 AS builder
+FROM golang:1.16-alpine3.13 AS builder
 
 ENV GOFLAGS="-mod=readonly"
 
-RUN apk add --update --no-cache ca-certificates make git curl mercurial bzr
+RUN apk add --update --no-cache ca-certificates make git curl mercurial
 
 RUN mkdir -p /workspace
 WORKDIR /workspace
@@ -29,7 +15,6 @@ RUN go mod download
 
 COPY Makefile main-targets.mk /workspace/
 
-COPY --from=frontend /web/dist/web /workspace/web/dist/web
 COPY . /workspace
 
 ARG BUILD_TARGET
@@ -46,7 +31,7 @@ RUN set -xe && \
 
 
 # Final image
-FROM alpine:3.12
+FROM alpine:3.14.0
 
 RUN apk add --update --no-cache ca-certificates tzdata bash curl
 

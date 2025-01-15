@@ -22,11 +22,11 @@ docker-compose.override.yml:
 .PHONY: start
 start: docker-compose.override.yml ## Start docker development environment
 	@ if [ docker-compose.override.yml -ot docker-compose.override.yml.dist ]; then diff -u docker-compose.override.yml docker-compose.override.yml.dist || (echo "!!! The distributed docker-compose.override.yml example changed. Please update your file accordingly (or at least touch it). !!!" && false); fi
-	docker-compose up -d
+	docker compose up -d
 
 .PHONY: stop
 stop: ## Stop docker development environment
-	docker-compose stop
+	docker compose stop
 
 .PHONY: clean
 clean: ## Clean builds
@@ -47,19 +47,12 @@ endif
 	go build ${GOARGS} -tags "${GOTAGS}" -ldflags "${LDFLAGS}" -o ${BUILD_DIR}/${BINARY_NAME} ${BUILD_PACKAGE}
 
 .PHONY: build-release
-build-release: $(patsubst cmd/%,cmd/%/pkged.go,$(wildcard cmd/*)) ## Build all binaries without debug information
+build-release: ## Build all binaries without debug information
 	@${MAKE} LDFLAGS="-w ${LDFLAGS}" GOARGS="${GOARGS} -trimpath" BUILD_DIR="${BUILD_DIR}/release" build
 
 .PHONY: build-debug
-build-debug: $(patsubst cmd/%,cmd/%/pkged.go,$(wildcard cmd/*)) ## Build all binaries with remote debugging capabilities
+build-debug: ## Build all binaries with remote debugging capabilities
 	@${MAKE} GOARGS="${GOARGS} -gcflags \"all=-N -l\"" BUILD_DIR="${BUILD_DIR}/debug" build
-
-bin/pkger: go.mod
-	@mkdir -p bin
-	go build -o bin/pkger github.com/markbates/pkger/cmd/pkger
-
-cmd/%/pkged.go: bin/pkger ## Embed static files
-	bin/pkger -o cmd/$*
 
 .PHONY: docker
 docker: ## Build a Docker image
@@ -76,7 +69,7 @@ ifeq (${DOCKER_LATEST}, 1)
 endif
 
 .PHONY: check
-check: test lint ## Run tests and linters
+check: test ## Run tests
 
 bin/gotestsum: bin/gotestsum-${GOTESTSUM_VERSION}
 	@ln -sf gotestsum-${GOTESTSUM_VERSION} bin/gotestsum
@@ -87,6 +80,7 @@ bin/gotestsum-${GOTESTSUM_VERSION}:
 TEST_PKGS ?= ./...
 TEST_REPORT_NAME ?= results.xml
 .PHONY: test
+test:
 test: TEST_REPORT ?= main
 test: TEST_FORMAT ?= short
 test: SHELL = /bin/bash
@@ -106,37 +100,6 @@ test-integration: ## Run integration tests
 test-functional: ## Run functional tests
 	@${MAKE} GOARGS="${GOARGS} -run ^TestFunctional\$$\$$" TEST_REPORT=functional test
 
-bin/golangci-lint: bin/golangci-lint-${GOLANGCI_VERSION}
-	@ln -sf golangci-lint-${GOLANGCI_VERSION} bin/golangci-lint
-bin/golangci-lint-${GOLANGCI_VERSION}:
-	@mkdir -p bin
-	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b ./bin/ v${GOLANGCI_VERSION}
-	@mv bin/golangci-lint $@
-
-.PHONY: lint
-lint: bin/golangci-lint ## Run linter
-	bin/golangci-lint run
-
-.PHONY: fix
-fix: bin/golangci-lint ## Fix lint violations
-	bin/golangci-lint run --fix
-
-bin/licensei: bin/licensei-${LICENSEI_VERSION}
-	@ln -sf licensei-${LICENSEI_VERSION} bin/licensei
-bin/licensei-${LICENSEI_VERSION}:
-	@mkdir -p bin
-	curl -sfL https://raw.githubusercontent.com/goph/licensei/master/install.sh | bash -s v${LICENSEI_VERSION}
-	@mv bin/licensei $@
-
-.PHONY: license-check
-license-check: bin/licensei ## Run license check
-	bin/licensei check
-	./scripts/check-header.sh
-
-.PHONY: license-cache
-license-cache: bin/licensei ## Generate license cache
-	bin/licensei cache
-
 .PHONY: list
 list: ## List all make targets
 	@$(MAKE) -pRrn : -f $(MAKEFILE_LIST) 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | sort
@@ -150,20 +113,13 @@ help:
 var-%: ; @echo $($*)
 varexport-%: ; @echo $*=$($*)
 
-bin/gobin: bin/gobin-${GOBIN_VERSION}
-	@ln -sf gobin-${GOBIN_VERSION} bin/gobin
-bin/gobin-${GOBIN_VERSION}:
-	@mkdir -p bin
-	curl -L https://github.com/myitcv/gobin/releases/download/v${GOBIN_VERSION}/${OS}-amd64 > ./bin/gobin-${GOBIN_VERSION} && chmod +x ./bin/gobin-${GOBIN_VERSION}
-
 bin/gqlgen: bin/gqlgen-${GQLGEN_VERSION}
 	@ln -sf gqlgen-${GQLGEN_VERSION} bin/gqlgen
-bin/gqlgen-${GQLGEN_VERSION}: bin/gobin
+bin/gqlgen-${GQLGEN_VERSION}:
 	@mkdir -p bin
-	GOBIN=bin/ bin/gobin github.com/99designs/gqlgen@v${GQLGEN_VERSION}
+	GOBIN=$$PWD/bin go install github.com/99designs/gqlgen@v${GQLGEN_VERSION}
 	@mv bin/gqlgen bin/gqlgen-${GQLGEN_VERSION}
 
 .PHONY: graphql
 graphql: bin/gqlgen ## Generate GraphQL code
 	bin/gqlgen
-

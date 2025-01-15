@@ -15,18 +15,11 @@
 package api
 
 import (
-	"fmt"
-	"io/ioutil"
 	"net/http"
-	"strings"
 
-	"emperror.dev/emperror"
-	"emperror.dev/errors"
 	ginprometheus "github.com/banzaicloud/go-gin-prometheus"
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/markbates/pkger"
 
 	"github.com/banzaicloud/cloudinfo/internal/cloudinfo"
 	"github.com/banzaicloud/cloudinfo/internal/cloudinfo/metrics"
@@ -67,32 +60,7 @@ func (r *RouteHandler) ConfigureRoutes(router *gin.Engine, basePath string) {
 	router.Use(log.Middleware())
 	router.Use(cors.New(corsConfig))
 
-	dir := pkger.Dir("/web/dist/web")
-	router.Use(static.Serve(basePath, pkgerFileSystem{dir}))
-
 	base := router.Group(basePath)
-
-	{
-		indexFile, err := dir.Open("/index.html")
-		emperror.Panic(errors.WrapIf(err, "open index.html"))
-
-		indexContent, err := ioutil.ReadAll(indexFile)
-		emperror.Panic(err)
-
-		newIndexContent := []byte(strings.Replace(
-			string(indexContent),
-			"<base href=\"/\">",
-			fmt.Sprintf("<base href=\"%s/\">", basePath),
-			-1,
-		))
-
-		base.GET("/", func(c *gin.Context) {
-			_, _ = c.Writer.Write(newIndexContent)
-		})
-		base.GET("index.html", func(c *gin.Context) {
-			c.Redirect(http.StatusMovedPermanently, "./")
-		})
-	}
 
 	{
 		base.GET("/status", r.signalStatus)

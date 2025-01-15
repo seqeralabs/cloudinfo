@@ -5,7 +5,8 @@ on:
     branches:
       - master
     tags:
-      - '[0-9]+.[0-9]+.[0-9]+'
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-dev.[0-9]+"
   pull_request:
 
 jobs:
@@ -41,10 +42,10 @@ jobs:
             fi
           done
 
-          echo ::set-output name=version::${VERSION}
-          echo ::set-output name=tags::$(IFS=,; echo "${TAGS[*]}")
-          echo ::set-output name=commit_hash::${GITHUB_SHA::8}
-          echo ::set-output name=build_date::$(git show -s --format=%cI)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          IFS=, ; echo "tags=${TAGS[*]}" >> $GITHUB_OUTPUT
+          echo "commit_hash=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+          echo "build_date=$(git show -s --format=%cI)" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -54,7 +55,8 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
+          password: ${{ github.token }}
+        if: github.event_name == 'push'
 
       - name: Build and push
         uses: docker/build-push-action@v2
