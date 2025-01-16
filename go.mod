@@ -14,7 +14,7 @@ require (
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.13
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1190
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
-	github.com/aws/aws-sdk-go v1.55.5
+	github.com/aws/aws-sdk-go v1.55.6
 	github.com/banzaicloud/go-gin-prometheus v0.1.0
 	github.com/digitalocean/godo v1.133.0
 	github.com/gin-contrib/cors v1.7.3
