@@ -16,7 +16,7 @@ require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/aws/aws-sdk-go v1.55.6
 	github.com/banzaicloud/go-gin-prometheus v0.1.0
-	github.com/digitalocean/godo v1.133.0
+	github.com/digitalocean/godo v1.134.0
 	github.com/gin-contrib/cors v1.7.3
 	github.com/gin-contrib/static v1.1.3
 	github.com/gin-gonic/gin v1.10.0
