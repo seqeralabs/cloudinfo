@@ -51,6 +51,7 @@ var regionNames = map[string]string{
 	"northamerica-northeast2": "Americas (Toronto)",
 	"southamerica-west1":      "Americas (Santiago)",
 	"southamerica-east1":      "Americas (SãoPaulo)",
+	"northamerica-south1":     "Americas (Mexico)",
 	"europe-west2":            "Europe (London)",
 	"europe-west1":            "Europe (Belgium)",
 	"europe-west4":            "Europe (Netherlands)",
@@ -76,7 +77,6 @@ var regionNames = map[string]string{
 	"asia-northeast3":         "Asia Pacific (Seoul)",
 	"me-west1":                "Middle East (TelAviv)",
 	"me-central1":             "Middle East (Doha)",
-	"me-central2":             "Middle East (Dammam)",
 	"africa-south1":           "Africa (Johannesburg)",
 }
 
