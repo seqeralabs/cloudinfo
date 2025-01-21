@@ -55,7 +55,7 @@ jobs:
         with:
           registry: cr.seqera.io
           username: ${{ secrets.SEQERA_CR_USERNAME }}
-          password: ${{ secrets.SEQERA_PUBLIC_CR_PASSWORD }}
+          password: ${{ secrets.SEQERA_CR_PASSWORD }}
 
       - name: Build and push
         uses: docker/build-push-action@v2
