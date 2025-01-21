@@ -39,7 +39,8 @@ SHELL ["/bin/bash", "-c"]
 
 # set up nsswitch.conf for Go's "netgo" implementation
 # https://github.com/gliderlabs/docker-alpine/issues/367#issuecomment-424546457
-RUN test ! -e /etc/nsswitch.conf && echo 'hosts: files dns' > /etc/nsswitch.conf
+RUN echo 'hosts: files dns' > /etc/nsswitch.conf
+#RUN test ! -e /etc/nsswitch.conf && echo 'hosts: files dns' > /etc/nsswitch.conf
 
 ARG BUILD_TARGET
 
@@ -51,6 +52,6 @@ COPY configs /etc/cloudinfo/serviceconfig
 
 RUN sed -i "s|dataLocation: ./configs/|dataLocation: /etc/cloudinfo/serviceconfig/|g" /etc/cloudinfo/serviceconfig/services.yaml
 
-ENV CLOUDINFO_SERVICELOADER_SERVICECONFIGLOCATION "/etc/cloudinfo/serviceconfig"
+ENV CLOUDINFO_SERVICELOADER_SERVICECONFIGLOCATION="/etc/cloudinfo/serviceconfig"
 
 CMD ["cloudinfo"]
