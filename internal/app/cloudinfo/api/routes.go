@@ -63,6 +63,7 @@ func (r *RouteHandler) ConfigureRoutes(router *gin.Engine, basePath string) {
 	base := router.Group(basePath)
 
 	{
+		base.GET("/", r.signalEmpty)
 		base.GET("/status", r.signalStatus)
 		base.GET("/version", r.versionHandler)
 	}
@@ -90,6 +91,10 @@ func (r *RouteHandler) ConfigureRoutes(router *gin.Engine, basePath string) {
 
 func (r *RouteHandler) signalStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, "ok")
+}
+
+func (r *RouteHandler) signalEmpty(c *gin.Context) {
+	c.JSON(http.StatusOK, "")
 }
 
 func (r *RouteHandler) versionHandler(c *gin.Context) {
