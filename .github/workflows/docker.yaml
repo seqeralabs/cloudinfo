@@ -76,5 +76,5 @@ jobs:
             org.opencontainers.image.created=${{ steps.tags.outputs.build_date }}
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.licenses=${{ github.event.repository.license.spdx_id }}
-            org.opencontainers.image.vendor=Banzai Cloud
-            org.opencontainers.image.documentation=https://banzaicloud.com/docs/pipeline/overview/
+            org.opencontainers.image.vendor=Seqera Labs
+            org.opencontainers.image.documentation=https://seqeralabs.com/docs/pipeline/overview/
