@@ -28,14 +28,11 @@ package main
 
 import (
 	"fmt"
-	"net/url"
 	"os"
 
 	"emperror.dev/emperror"
 	"emperror.dev/errors"
 	"github.com/gin-gonic/gin"
-	vaultremote "github.com/sagikazarmark/viperx/remote"
-	_ "github.com/sagikazarmark/viperx/remote/bankvaults"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
@@ -100,22 +97,6 @@ func main() {
 
 	err = metaConfig.Validate()
 	emperror.Panic(err)
-
-	if metaConfig.Vault.Enabled {
-		vaultremote.SetErrorHandler(errorhandler.NewPanicHandler())
-
-		u, _ := url.Parse(metaConfig.Vault.Address)
-		q := u.Query()
-		q.Set("token", metaConfig.Vault.Token)
-		u.RawQuery = q.Encode()
-
-		err = v.AddRemoteProvider("bankvaults", u.String(), metaConfig.Vault.SecretPath)
-		emperror.Panic(errors.Wrap(err, "failed to add vault config provider"))
-
-		v.SetConfigType("json")
-		err = v.ReadRemoteConfig()
-		emperror.Panic(errors.Wrap(err, "failed to read remote configuration"))
-	}
 
 	var config configuration
 	err = v.Unmarshal(&config)
