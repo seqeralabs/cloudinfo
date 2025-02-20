@@ -251,20 +251,30 @@ func (g *GceInfoer) Initialize() (map[string]map[string]types.Price, error) {
 }
 
 func (g *GceInfoer) getPrice() (map[string]map[string]map[string]float64, error) {
-	svcList, err := g.cbSvc.Services.List().Fields("services/displayName", "services/name").Do()
-	if err != nil {
-		return nil, err
-	}
 
-	var compEngId string
-	for _, svc := range svcList.Services {
-		if svc.DisplayName == "Compute Engine" {
-			compEngId = svc.Name
+	compEngId := ""
+	nextPageToken := ""
+	for {
+		svcList, err := g.cbSvc.Services.List().PageToken(nextPageToken).Fields("services/displayName", "services/name", "nextPageToken").Do()
+		if err != nil {
+			return nil, err
+		}
+
+		nextPageToken = svcList.NextPageToken
+
+		for _, svc := range svcList.Services {
+			if svc.DisplayName == "Compute Engine" {
+				compEngId = svc.Name
+			}
+		}
+
+		if nextPageToken == "" || compEngId != "" {
+			break
 		}
 	}
 
 	price := make(map[string]map[string]map[string]float64)
-	err = g.cbSvc.Services.Skus.List(compEngId).Pages(context.Background(), func(response *cloudbilling.ListSkusResponse) error {
+	err := g.cbSvc.Services.Skus.List(compEngId).Pages(context.Background(), func(response *cloudbilling.ListSkusResponse) error {
 		for _, sku := range response.Skus {
 			if sku.Category.ResourceGroup == "G1Small" || sku.Category.ResourceGroup == "F1Micro" {
 				priceInUsd, err := g.priceInUsd(sku.PricingInfo)
