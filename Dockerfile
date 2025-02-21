@@ -34,6 +34,7 @@ RUN set -xe && \
 FROM alpine:edge
 
 RUN apk add --update --no-cache ca-certificates tzdata bash curl
+RUN apk update && apk upgrade
 
 SHELL ["/bin/bash", "-c"]
 
