@@ -33,7 +33,8 @@ RUN set -xe && \
 # Final image
 FROM alpine:edge
 
-RUN apk add --update --no-cache ca-certificates tzdata bash curl libcrypto3 libssl3
+RUN apk add --update --no-cache ca-certificates tzdata bash curl
+RUN apk update && apk upgrade
 
 SHELL ["/bin/bash", "-c"]
 
