@@ -32,7 +32,7 @@ jobs:
 
       - name: Cache Go module dependencies
         id: cache-go-module-dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/go/pkg/mod
           key: go-mod-cache-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles('go.sum') }}
@@ -59,7 +59,7 @@ jobs:
 
       - name: Restore Go module dependencies cache
         id: cache-go-module-dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/go/pkg/mod
           key: go-mod-cache-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles('go.sum') }}
@@ -86,7 +86,7 @@ jobs:
 
       - name: Restore Go module dependencies cache
         id: cache-go-module-dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/go/pkg/mod
           key: go-mod-cache-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles('go.sum') }}
