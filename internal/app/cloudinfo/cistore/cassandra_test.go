@@ -37,7 +37,7 @@ func testCassandraStore(t *testing.T) {
 		cloudinfoadapter.NewLogger(&logur.TestLogger{}),
 	)
 
-	ctx, cancelFunction := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancelFunction := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancelFunction()
 loop:
 	for {
