@@ -28,11 +28,11 @@ const (
 )
 
 type ProblemWrapper struct {
-	*problems.DefaultProblem
+	*problems.Problem
 }
 
 func (pw *ProblemWrapper) String() string {
-	str, _ := json.Marshal(pw.DefaultProblem)
+	str, _ := json.Marshal(pw.Problem)
 	return string(str)
 }
 
