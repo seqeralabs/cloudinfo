@@ -8,7 +8,7 @@ require (
 	emperror.dev/emperror v0.33.0
 	emperror.dev/errors v0.8.1
 	emperror.dev/handler/logur v0.5.0
-	github.com/99designs/gqlgen v0.17.66
+	github.com/99designs/gqlgen v0.17.73
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.11.30
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.13
