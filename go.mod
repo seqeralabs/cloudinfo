@@ -26,7 +26,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/moogar0880/problems v0.1.1
+	github.com/moogar0880/problems v1.0.0
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/prometheus/client_golang v1.22.0
